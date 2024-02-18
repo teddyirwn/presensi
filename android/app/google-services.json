@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "675459286429",
+    "project_id": "presensi-chat-flutter",
+    "storage_bucket": "presensi-chat-flutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675459286429:android:114868d656eca69a439b74",
+        "android_client_info": {
+          "package_name": "com.teddy.presensi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtUl8AkEfrf9K-Oo_ncuCg6jYm7uLFZW0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
