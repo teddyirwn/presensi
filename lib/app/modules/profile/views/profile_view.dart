@@ -1,5 +1,6 @@
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:chatapp/app/utils/theme/theme.dart';
+import 'package:chatapp/app/utils/bottom_navigation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -67,7 +68,7 @@ class ProfileView extends GetView<ProfileController> {
                       ),
                     )),
                 Obx(() => Text(
-                      "${authC.user.value.role!}",
+                      "${authC.user.value.nisn!}",
                       style: TextStyle(
                         fontSize: 20,
                       ),
@@ -120,21 +121,9 @@ class ProfileView extends GetView<ProfileController> {
               ),
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(bottom: 15),
-            child: const Column(
-              children: [
-                Text(
-                  "Chat App",
-                ),
-                Text(
-                  "v.1.1.1",
-                ),
-              ],
-            ),
-          ),
         ],
       ),
+      bottomNavigationBar: NavigationMenu(),
     );
   }
 }

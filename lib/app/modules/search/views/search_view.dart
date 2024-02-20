@@ -107,7 +107,7 @@ class SearchView extends GetView<search.SearchController> {
                       maxLines: 1,
                     ),
                     subtitle: Text(
-                      "${controller.tempSearch[index]["email"]}",
+                      "${controller.tempSearch[index]["nisn"]}",
                       style: const TextStyle(
                         fontSize: 16,
                       ),
@@ -116,7 +116,7 @@ class SearchView extends GetView<search.SearchController> {
                     ),
                     trailing: GestureDetector(
                       onTap: () => authC.addNewConnection(
-                          controller.tempSearch[index]["nisn"]),
+                          controller.tempSearch[index]["uid"]),
                       child: Chip(
                         backgroundColor: Colors.grey.shade300,
                         side: BorderSide.none,

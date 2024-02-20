@@ -1,3 +1,4 @@
+import 'package:chatapp/app/routes/app_pages.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -5,10 +6,27 @@ import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 
 class PresensiLocationController extends GetxController {
-  final nisn = GetStorage().read("nisn");
+  RxInt pageIndex = 0.obs;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  void changePage(i) {
+    switch (i) {
+      case 1:
+        pageIndex.value = i;
+        Get.offAllNamed(Routes.HOME);
+        break;
+      case 2:
+        pageIndex.value = i;
+        Get.offAllNamed(Routes.PROFILE);
+        break;
+      default:
+        pageIndex.value = i;
+        Get.offAllNamed(Routes.PRESENSI_SISWA);
+    }
+  }
 
   void getPosisition() async {
     Map<String, dynamic> res = await determinePosition();
@@ -20,9 +38,9 @@ class PresensiLocationController extends GetxController {
           await placemarkFromCoordinates(position.latitude, position.longitude);
       String address =
           "${placemarks[0].name},  ${placemarks[0].subLocality}, ${placemarks[0].locality}";
-
+      print("${position.latitude}, ${position.longitude}");
       double distanse = Geolocator.distanceBetween(
-          -0.0706905, 109.4009582, position.latitude, position.longitude);
+          -0.0707134, 109.4010082, position.latitude, position.longitude);
 
       if (distanse >= 200) {
         Get.defaultDialog(
@@ -50,7 +68,9 @@ class PresensiLocationController extends GetxController {
   }
 
   Future<void> updatePosition(Position position, String address) async {
-    await firestore.collection("siswa").doc(nisn).update({
+    final uid = GetStorage().read("uid");
+
+    await firestore.collection("siswa").doc(uid).update({
       "position": {
         "lat": position.latitude,
         "long": position.longitude,
@@ -61,9 +81,9 @@ class PresensiLocationController extends GetxController {
 
   Future<void> presensi(
       Position position, String address, double distanse) async {
-    final nisn = GetStorage().read("nisn");
+    final uid = GetStorage().read("uid");
     CollectionReference<Map<String, dynamic>> colPresence =
-        await firestore.collection("siswa").doc(nisn).collection("presence");
+        await firestore.collection("siswa").doc(uid).collection("presence");
 
     QuerySnapshot<Map<String, dynamic>> snapPresece = await colPresence.get();
     String todayDocId =
@@ -124,7 +144,11 @@ class PresensiLocationController extends GetxController {
         }
       } else {
         // absen masuk
-
+        await sheetBottom(
+          "Selamat data Masuk anda berhasil di rekam",
+          DateTime.now(),
+          DateTime.now(),
+        );
         await colPresence.doc(todayDocId).set({
           "date": DateTime.now().toIso8601String(),
           "masuk": {
@@ -136,11 +160,6 @@ class PresensiLocationController extends GetxController {
             "distanse": distanse,
           }
         });
-        await sheetBottom(
-          "Selamat data Masuk anda berhasil di rekam",
-          DateTime.now(),
-          DateTime.now(),
-        );
       }
     }
   }
@@ -210,15 +229,11 @@ class PresensiLocationController extends GetxController {
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(top: 50, right: 18, left: 18),
+            padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Center(
               child: Column(
                 children: [
-                  Icon(
-                    Icons.check_circle,
-                    size: 80,
-                    color: Colors.red.shade400,
-                  ),
+                  Lottie.asset("assets/lottie/success.json"),
                   const Text(
                     "Anda Berhasil Absen",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -271,13 +286,16 @@ class PresensiLocationController extends GetxController {
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      fixedSize: Size(300, 30),
+                      fixedSize: Size(Get.size.width, 30),
                       backgroundColor: Colors.red.shade300,
                     ),
                     onPressed: () {
                       Get.back();
                     },
-                    child: Text("Tutup"),
+                    child: const Text(
+                      "Tutup",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   )
                 ],
               ),

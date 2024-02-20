@@ -1,5 +1,6 @@
 import 'package:chatapp/app/controllers/auth_controller.dart';
 import 'package:chatapp/app/routes/app_pages.dart';
+import 'package:chatapp/app/utils/bottom_navigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -50,7 +51,7 @@ class HomeView extends GetView<HomeController> {
           Expanded(
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: controller.chatStream(
-                  authC.user.value.nisn!,
+                  authC.user.value.uid!,
                 ),
                 builder: (contex, snapshot) {
                   if (snapshot.connectionState == ConnectionState.active) {
@@ -68,12 +69,12 @@ class HomeView extends GetView<HomeController> {
                             builder: (contex, snapshot2) {
                               if (snapshot2.connectionState ==
                                   ConnectionState.active) {
-                                var data = snapshot2.data!.data();
+                                var data = snapshot2.data?.data();
 
                                 return ListTile(
                                   onTap: () => controller.goToChatRoom(
                                     "${allChats[index].id}",
-                                    authC.user.value.nisn!,
+                                    authC.user.value.uid!,
                                     allChats[index]["connection"],
                                   ),
                                   leading: SizedBox(
@@ -108,16 +109,22 @@ class HomeView extends GetView<HomeController> {
                                       builder: (context, chatSnap) {
                                         if (chatSnap.connectionState ==
                                             ConnectionState.active) {
-                                          var chatHistory =
-                                              chatSnap.data!.docs[index].data();
-                                          return Text(
-                                            "${chatHistory['msg']}",
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                            ),
-                                          );
+                                          if (chatSnap.data!.docs.length > 0) {
+                                            print(chatSnap.data!.docs.length);
+                                            var chatHistory = chatSnap
+                                                .data?.docs[index]
+                                                .data();
+
+                                            return Text(
+                                              // "sasas",
+                                              "${chatHistory?['msg']}",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                              ),
+                                            );
+                                          }
                                         }
                                         return const SizedBox.shrink();
                                       }),
@@ -154,6 +161,7 @@ class HomeView extends GetView<HomeController> {
           color: Colors.white,
         ),
       ),
+      bottomNavigationBar: NavigationMenu(),
     );
   }
 }

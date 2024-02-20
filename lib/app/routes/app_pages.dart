@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import '../modules/add_siswa/bindings/add_siswa_binding.dart';
 import '../modules/add_siswa/views/add_siswa_view.dart';
+import '../modules/admin/add_petugas/bindings/add_petugas_binding.dart';
+import '../modules/admin/add_petugas/views/add_petugas_view.dart';
 import '../modules/admin/bindings/admin_binding.dart';
 import '../modules/admin/views/admin_view.dart';
 import '../modules/all_presensi/bindings/all_presensi_binding.dart';
@@ -18,6 +20,8 @@ import '../modules/introduction/bindings/introduction_binding.dart';
 import '../modules/introduction/views/introduction_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
+import '../modules/login_admin/bindings/login_admin_binding.dart';
+import '../modules/login_admin/views/login_admin_view.dart';
 import '../modules/presensi_siswa/bindings/presensi_siswa_binding.dart';
 import '../modules/presensi_siswa/views/presensi_siswa_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
@@ -82,6 +86,13 @@ class AppPages {
       name: _Paths.ADMIN,
       page: () => const AdminView(),
       binding: AdminBinding(),
+      children: [
+        GetPage(
+          name: _Paths.ADD_PETUGAS,
+          page: () => const AddPetugasView(),
+          binding: AddPetugasBinding(),
+        ),
+      ],
     ),
     GetPage(
       name: _Paths.ADD_SISWA,
@@ -97,6 +108,11 @@ class AppPages {
       name: _Paths.ALL_PRESENSI,
       page: () => const AllPresensiView(),
       binding: AllPresensiBinding(),
+    ),
+    GetPage(
+      name: _Paths.LOGIN_ADMIN,
+      page: () => const LoginAdminView(),
+      binding: LoginAdminBinding(),
     ),
   ];
 }

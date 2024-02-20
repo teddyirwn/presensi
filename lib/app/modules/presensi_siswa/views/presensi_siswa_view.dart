@@ -2,6 +2,7 @@ import 'package:chatapp/app/controllers/auth_controller.dart';
 import 'package:chatapp/app/controllers/presensi_location_controller.dart';
 import 'package:chatapp/app/modules/presensi_siswa/views/widget/card_presensi.dart';
 import 'package:chatapp/app/routes/app_pages.dart';
+import 'package:chatapp/app/utils/bottom_navigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,6 @@ import '../controllers/presensi_siswa_controller.dart';
 
 class PresensiSiswaView extends GetView<PresensiSiswaController> {
   const PresensiSiswaView({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final authC = Get.find<AuthController>();
@@ -97,10 +97,8 @@ class PresensiSiswaView extends GetView<PresensiSiswaController> {
                             dataToday?['masuk'] == null
                                 ? "-"
                                 : dataToday?['keluar'] == null
-                                    ? DateFormat.jms().format(DateTime.parse(
-                                        dataToday?['masuk']['date']))
-                                    : DateFormat.jms().format(DateTime.parse(
-                                        dataToday?['keluar']['date'])),
+                                    ? "${DateFormat.Hm().format(DateTime.parse(dataToday?['masuk']['date']))} WIB"
+                                    : "${DateFormat.Hm().format(DateTime.parse(dataToday?['keluar']['date']))} WIB",
                             style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.white,
@@ -233,18 +231,14 @@ class PresensiSiswaView extends GetView<PresensiSiswaController> {
                                       );
                                     },
                                     child: CardPresensi(
-                                      date: DateFormat.yMMMEd()
+                                      date: DateFormat.yMMMEd('id_ID')
                                           .format(DateTime.parse(data['date'])),
                                       jamK: data['keluar']?['date'] == null
                                           ? "-"
-                                          : DateFormat.jms().format(
-                                              DateTime.parse(
-                                                  data['keluar']!['date'])),
+                                          : "${DateFormat.Hm().format(DateTime.parse(data['keluar']!['date']))} WIB",
                                       jamM: data['masuk']?['date'] == null
                                           ? "-"
-                                          : DateFormat.jms().format(
-                                              DateTime.parse(
-                                                  data['masuk']!['date'])),
+                                          : "${DateFormat.Hm().format(DateTime.parse(data['masuk']!['date']))} WIB",
                                     ),
                                   ),
                                 ),
@@ -259,13 +253,7 @@ class PresensiSiswaView extends GetView<PresensiSiswaController> {
           ),
         ],
       )),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home,"),
-          BottomNavigationBarItem(icon: Icon(Icons.message), label: "Chat,")
-        ],
-      ),
+      bottomNavigationBar: NavigationMenu(),
     );
   }
 }

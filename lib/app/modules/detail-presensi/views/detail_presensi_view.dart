@@ -34,7 +34,7 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                       ),
                     )),
                     Center(
-                        child: Text(DateFormat.yMMMMEEEEd()
+                        child: Text(DateFormat.yMMMMEEEEd("id_ID")
                             .format(DateTime.parse(data['date'])))),
                     SizedBox(
                       height: 10,
@@ -45,7 +45,7 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                        " ${DateFormat.jms().format(DateTime.parse(data['masuk']['date']))}"),
+                        " ${DateFormat.Hm().format(DateTime.parse(data['masuk']['date']))} WIB"),
                     SizedBox(
                       height: 10,
                     ),
@@ -94,7 +94,7 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                       ),
                     )),
                     Center(
-                        child: Text(DateFormat.yMMMMEEEEd()
+                        child: Text(DateFormat.yMMMMEEEEd("id_ID")
                             .format(DateTime.parse(data['date'])))),
                     const SizedBox(
                       height: 10,
@@ -104,9 +104,9 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
-                    Text(data['masuk']['date'] == null
+                    Text(data['keluar']?['date'] == null
                         ? "-"
-                        : " ${DateFormat.jms().format(DateTime.parse(data['keluar']['date']))}"),
+                        : " ${DateFormat.Hm().format(DateTime.parse(data['keluar']['date']))} WIB"),
                     const SizedBox(
                       height: 10,
                     ),
@@ -115,7 +115,7 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
-                    Text(data['keluar']['status'] ?? "-"),
+                    Text(data['keluar']?['status'] ?? "-"),
                     const SizedBox(
                       height: 10,
                     ),
@@ -124,9 +124,9 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
-                    Text(
-                        "${data['keluar']['distanse'].toString().split('.').first} Meter" ??
-                            "-"),
+                    Text(data['keluar']?['distanse'] == null
+                        ? "${data['keluar']?['distanse'].toString().split('.').first} Meter"
+                        : "-"),
                     const SizedBox(
                       height: 10,
                     ),
@@ -135,7 +135,7 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
-                    Text(data['keluar']['address'] ?? "-"),
+                    Text(data['keluar']?['address'] ?? "-"),
                   ],
                 ),
               )

@@ -15,6 +15,7 @@ import '../controllers/chat_room_controller.dart';
 class ChatRoomView extends GetView<ChatRoomController> {
   final authC = Get.find<AuthController>();
   final String chatId = (Get.arguments as Map<String, dynamic>)["chat_id"];
+  final Map<String, dynamic> dataUid = Get.arguments;
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +35,12 @@ class ChatRoomView extends GetView<ChatRoomController> {
           leadingWidth: 50,
           backgroundColor: Get.theme.appBarTheme.backgroundColor,
           title: StreamBuilder<DocumentSnapshot<dynamic>>(
-              stream: controller.streamFriendData(
-                  (Get.arguments as Map<String, dynamic>)["friendNisn"]),
+              stream: controller.streamFriendData(dataUid['friendUid']),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.active) {
                   var dataFriend =
-                      snapshot.data!.data() as Map<String, dynamic>;
-                  return dataFriend["status"] != ""
+                      snapshot.data!.data() as Map<String, dynamic>?;
+                  return dataFriend?["status"] != ""
                       ? ListTile(
                           contentPadding: EdgeInsets.zero,
                           leading: ClipRRect(
@@ -49,19 +49,19 @@ class ChatRoomView extends GetView<ChatRoomController> {
                               color: Colors.grey,
                               width: 45,
                               height: 45,
-                              child: dataFriend["photoUrl"] == "noimage"
+                              child: dataFriend?["photoUrl"] == "noimage"
                                   ? Image.asset(
                                       "assets/logo/noimage.png",
                                       fit: BoxFit.cover,
                                     )
                                   : Image.network(
-                                      dataFriend["photoUrl"],
+                                      dataFriend?["photoUrl"],
                                       fit: BoxFit.cover,
                                     ),
                             ),
                           ),
                           title: Text(
-                            dataFriend["name"],
+                            dataFriend?["name"],
                             style: const TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -69,7 +69,7 @@ class ChatRoomView extends GetView<ChatRoomController> {
                             ),
                           ),
                           subtitle: Text(
-                            dataFriend["status"],
+                            dataFriend?["status"],
                             style: const TextStyle(
                               fontSize: 15,
                               color: Colors.white,
@@ -85,19 +85,19 @@ class ChatRoomView extends GetView<ChatRoomController> {
                               color: Colors.grey,
                               width: 45,
                               height: 45,
-                              child: dataFriend["photoUrl"] == "noimage"
+                              child: dataFriend?["photoUrl"] == "noimage"
                                   ? Image.asset(
                                       "assets/logo/noimage.png",
                                       fit: BoxFit.cover,
                                     )
                                   : Image.network(
-                                      dataFriend["photoUrl"],
+                                      dataFriend?["photoUrl"],
                                       fit: BoxFit.cover,
                                     ),
                             ),
                           ),
                           title: Text(
-                            dataFriend["name"],
+                            dataFriend?["name"],
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -192,7 +192,7 @@ class ChatRoomView extends GetView<ChatRoomController> {
                                           lastTime: allData[index]['time'],
                                           isSender: allData[index]
                                                       ['pengirim'] ==
-                                                  authC.user.value.nisn
+                                                  authC.user.value.uid
                                               ? true
                                               : false,
                                           msg: "${allData[index]['msg']}",
@@ -205,7 +205,7 @@ class ChatRoomView extends GetView<ChatRoomController> {
                                       return ItemChat(
                                         lastTime: allData[index]['time'],
                                         isSender: allData[index]['pengirim'] ==
-                                                authC.user.value.nisn
+                                                authC.user.value.uid
                                             ? true
                                             : false,
                                         msg: "${allData[index]['msg']}",
@@ -222,7 +222,7 @@ class ChatRoomView extends GetView<ChatRoomController> {
                                             lastTime: allData[index]['time'],
                                             isSender: allData[index]
                                                         ['pengirim'] ==
-                                                    authC.user.value.nisn
+                                                    authC.user.value.uid
                                                 ? true
                                                 : false,
                                             msg: "${allData[index]['msg']}",
@@ -253,7 +253,7 @@ class ChatRoomView extends GetView<ChatRoomController> {
                             focusNode: controller.focusNote,
                             onEditingComplete: () {
                               return controller.newChat(
-                                authC.user.value.nisn!,
+                                authC.user.value.uid!,
                                 Get.arguments as Map<String, dynamic>,
                                 controller.chatC.text,
                               );
@@ -289,7 +289,7 @@ class ChatRoomView extends GetView<ChatRoomController> {
                           ),
                           onPressed: () {
                             return controller.newChat(
-                              authC.user.value.nisn!,
+                              authC.user.value.uid!,
                               Get.arguments as Map<String, dynamic>,
                               controller.chatC.text,
                             );
@@ -410,7 +410,7 @@ class ItemChat extends StatelessWidget {
               ),
             ),
           ),
-          Text(DateFormat.jm().format(DateTime.parse(lastTime))),
+          Text(DateFormat.Hm().format(DateTime.parse(lastTime))),
         ],
       ),
     );

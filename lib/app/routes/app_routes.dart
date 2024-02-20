@@ -16,6 +16,8 @@ abstract class Routes {
   static const ADD_SISWA = _Paths.ADD_SISWA;
   static const DETAIL_PRESENSI = _Paths.DETAIL_PRESENSI;
   static const ALL_PRESENSI = _Paths.ALL_PRESENSI;
+  static const ADD_PETUGAS = _Paths.ADMIN + _Paths.ADD_PETUGAS;
+  static const LOGIN_ADMIN = _Paths.LOGIN_ADMIN;
 }
 
 abstract class _Paths {
@@ -33,4 +35,6 @@ abstract class _Paths {
   static const ADD_SISWA = '/add-siswa';
   static const DETAIL_PRESENSI = '/detail-presensi';
   static const ALL_PRESENSI = '/all-presensi';
+  static const ADD_PETUGAS = '/add-petugas';
+  static const LOGIN_ADMIN = '/login-admin';
 }

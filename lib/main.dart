@@ -2,6 +2,7 @@ import 'package:chatapp/app/controllers/auth_controller.dart';
 import 'package:chatapp/app/utils/theme/theme.dart';
 import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import '../app/utils/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -16,7 +17,9 @@ void main() async {
   await Firebase.initializeApp();
   await GetStorage.init();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(MyApp());
+  await initializeDateFormatting('id_ID', null).then((_) {
+    runApp(MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -58,7 +61,7 @@ class MyApp extends StatelessWidget {
                         ? Routes.PRESENSI_SISWA
                         : Routes.LOGIN
                     : Routes.INTRODUCTION,
-                // initialRoute: Routes.PROFILE,
+                // initialRoute: Routes.ADD_SISWA,
                 getPages: AppPages.routes,
               ));
         }

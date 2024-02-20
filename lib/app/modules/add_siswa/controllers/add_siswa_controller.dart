@@ -19,13 +19,15 @@ class AddSiswaController extends GetxController {
           return '$timestamp-$random';
         }
 
+        String uid = generateUID();
+
         CollectionReference siswa = firestore.collection("siswa");
 
-        final checkSiswa = await siswa.doc(nisnC.text).get();
+        final checkSiswa = await siswa.doc(uid).get();
 
         if (checkSiswa.data() == null) {
-          await siswa.doc(nisnC.text).set({
-            "uid": generateUID(),
+          await siswa.doc(uid).set({
+            "uid": uid,
             "nisn": nisnC.text,
             "name": namaC.text,
             "keyName": namaC.text.substring(0, 1).toUpperCase(),
@@ -37,9 +39,9 @@ class AddSiswaController extends GetxController {
             "lastSignInTime": DateTime.now().toIso8601String(),
             "updatedTime": DateTime.now().toIso8601String(),
           });
-          await siswa.doc(nisnC.text).collection("chats");
+          await siswa.doc(uid).collection("chats");
         } else {
-          await siswa.doc(nisnC.text).update({
+          await siswa.doc(uid).update({
             "lastSignInTime": DateTime.now().toIso8601String(),
           });
         }

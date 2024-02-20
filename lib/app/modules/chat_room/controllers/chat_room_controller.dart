@@ -23,10 +23,10 @@ class ChatRoomController extends GetxController {
     return chats.doc(chatId).collection("chat").orderBy("time").snapshots();
   }
 
-  Stream<DocumentSnapshot<dynamic>> streamFriendData(String friendEmail) {
+  Stream<DocumentSnapshot<dynamic>> streamFriendData(String friendUid) {
     CollectionReference siswa = firestore.collection("siswa");
 
-    return siswa.doc(friendEmail).snapshots();
+    return siswa.doc(friendUid).snapshots();
   }
 
   void addEmojiToChat(Emoji emoji) {
@@ -38,7 +38,7 @@ class ChatRoomController extends GetxController {
   }
 
   void newChat(
-    String nisn,
+    String uid,
     Map<String, dynamic> argument,
     String text,
   ) async {
@@ -48,8 +48,8 @@ class ChatRoomController extends GetxController {
       String date = DateTime.now().toIso8601String();
 
       await chats.doc(argument["chat_id"]).collection("chat").add({
-        "pengirim": nisn,
-        "penerima": argument["friendNisn"],
+        "pengirim": uid,
+        "penerima": argument["friendUid"],
         "msg": text,
         "time": date,
         "isRead": false,
@@ -60,16 +60,12 @@ class ChatRoomController extends GetxController {
           () => scrollC.jumpTo(scrollC.position.maxScrollExtent));
 
       chatC.clear();
-      await siswa
-          .doc(nisn)
-          .collection("chats")
-          .doc(argument["chat_id"])
-          .update({
+      await siswa.doc(uid).collection("chats").doc(argument["chat_id"]).update({
         "lastTime": date,
       });
 
       final checkFriend = await siswa
-          .doc(argument["friendNisn"])
+          .doc(argument["friendUid"])
           .collection("chats")
           .doc(argument["chat_id"])
           .get();
@@ -79,13 +75,13 @@ class ChatRoomController extends GetxController {
             .doc(argument["chat_id"])
             .collection("chat")
             .where("isRead", isEqualTo: false)
-            .where("pengirim", isEqualTo: nisn)
+            .where("pengirim", isEqualTo: uid)
             .get();
         // total unread for friend
         total_unread = checkTotalUnread.docs.length;
 
         await siswa
-            .doc(argument["friendNisn"])
+            .doc(argument["friendUid"])
             .collection("chats")
             .doc(argument["chat_id"])
             .update({
@@ -96,11 +92,11 @@ class ChatRoomController extends GetxController {
         //create new for friend db
 
         await siswa
-            .doc(argument["friendNisn"])
+            .doc(argument["friendUid"])
             .collection("chats")
             .doc(argument["chat_id"])
             .set({
-          "connection": nisn,
+          "connection": uid,
           "lastTime": date,
           "total_unread": 1,
         });

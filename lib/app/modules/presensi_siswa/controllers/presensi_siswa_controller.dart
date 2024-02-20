@@ -6,11 +6,11 @@ import 'package:intl/intl.dart';
 class PresensiSiswaController extends GetxController {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   Stream<QuerySnapshot<Map<String, dynamic>>> streamPresence() async* {
-    final nisn = GetStorage().read("nisn");
+    final uid = GetStorage().read("uid");
 
     yield* firestore
         .collection('siswa')
-        .doc(nisn)
+        .doc(uid)
         .collection('presence')
         .orderBy('date', descending: true)
         .limit(5)
@@ -18,13 +18,13 @@ class PresensiSiswaController extends GetxController {
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> streamTodayPresence() async* {
-    final nisn = GetStorage().read("nisn");
+    final uid = GetStorage().read("uid");
 
     String todayID =
         DateFormat.yMd().format(DateTime.now()).replaceAll("/", "-");
     yield* firestore
         .collection('siswa')
-        .doc(nisn)
+        .doc(uid)
         .collection('presence')
         .doc(todayID)
         .snapshots();

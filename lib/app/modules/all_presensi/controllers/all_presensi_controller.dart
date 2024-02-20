@@ -1,23 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class AllPresensiController extends GetxController {
-  //TODO: Implement AllPresensiController
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  Stream<QuerySnapshot<Map<String, dynamic>>> streamAllPresence() async* {
+    final uid = GetStorage().read("uid");
 
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
+    yield* firestore
+        .collection('siswa')
+        .doc(uid)
+        .collection('presence')
+        .orderBy('date', descending: true)
+        .snapshots();
   }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }

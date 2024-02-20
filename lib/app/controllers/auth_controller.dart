@@ -14,6 +14,7 @@ class AuthController extends GetxController {
   final isLoading = false.obs;
   final isAuth = false.obs;
   RxBool mode = false.obs;
+  RxInt pageIndex = 0.obs;
 
   UserCredential? userCredential;
 
@@ -48,24 +49,24 @@ class AuthController extends GetxController {
 
   Future<bool> autoLogin() async {
     try {
-      final nisn = GetStorage().read("nisn");
+      final uid = GetStorage().read("uid");
       print("NISNNNNNN");
-      print(nisn);
+      print(uid);
 
-      if (nisn != null) {
+      if (uid != null) {
         CollectionReference users = firestore.collection("siswa");
 
-        await users.doc(nisn).update({
+        await users.doc(uid).update({
           "lastSignInTime": DateTime.now().toIso8601String(),
         });
 
-        final currUser = await users.doc(nisn).get();
+        final currUser = await users.doc(uid).get();
         final currUserData = currUser.data() as Map<String, dynamic>;
         print(currUserData);
 
         user(UsersModel.fromJson(currUserData));
         user.refresh();
-        final listChats = await users.doc(nisn).collection("chats").get();
+        final listChats = await users.doc(uid).collection("chats").get();
         if (listChats.docs.length != 0) {
           List<ChatsUser> dataListChats = [];
           listChats.docs.forEach((element) {
@@ -107,7 +108,7 @@ class AuthController extends GetxController {
         if (checkSiswa.docs.isNotEmpty) {
           var dataSiswa = checkSiswa.docs.first.data() as Map<String, dynamic>;
           if (dataSiswa['password'] == pwC.text) {
-            await siswa.doc(nisnC.text).update({
+            await siswa.doc(dataSiswa['uid']).update({
               "lastSignInTime": DateTime.now().toIso8601String(),
             });
 
@@ -117,16 +118,16 @@ class AuthController extends GetxController {
               box.remove("skipIntro");
             }
             box.write("skipIntro", true);
-            box.write("nisn", dataSiswa['nisn']);
+            box.write("uid", dataSiswa['uid']);
 
-            final currUser = await siswa.doc(nisnC.text).get();
+            final currUser = await siswa.doc(dataSiswa['uid']).get();
             final currUserData = currUser.data() as Map<String, dynamic>;
 
             user(UsersModel.fromJson(currUserData));
 
             user.refresh();
             final listChats =
-                await siswa.doc(nisnC.text).collection("chats").get();
+                await siswa.doc(dataSiswa['uid']).collection("chats").get();
             // print(listChats.docs);
             if (listChats.docs.length != 0) {
               List<ChatsUser> dataListChats = [];
@@ -173,7 +174,7 @@ class AuthController extends GetxController {
   }
 
   void logout() {
-    GetStorage().remove('nisn');
+    GetStorage().remove('uid');
     Get.toNamed(Routes.LOGIN);
   }
 
@@ -183,11 +184,11 @@ class AuthController extends GetxController {
     String status,
   ) {
     String date = DateTime.now().toIso8601String();
-    final nisn = GetStorage().read("nisn");
+    final uid = GetStorage().read("uid");
     // update firebase
     CollectionReference users = firestore.collection("siswa");
 
-    users.doc(nisn).update({
+    users.doc(uid).update({
       "name": nama,
       "keyName": nama.substring(0, 1).toUpperCase(),
       "status": status,
@@ -211,10 +212,10 @@ class AuthController extends GetxController {
 
   void updateStatus(String status) {
     String date = DateTime.now().toIso8601String();
-    final nisn = GetStorage().read("nisn");
+    final uid = GetStorage().read("uid");
     CollectionReference users = firestore.collection("users");
 
-    users.doc(nisn).update({
+    users.doc(uid).update({
       "status": status,
       "lastSignInTime": date,
     });
@@ -235,10 +236,10 @@ class AuthController extends GetxController {
 
   void updatePhotoUrl(String url) async {
     String date = DateTime.now().toIso8601String();
-    final nisn = GetStorage().read("nisn");
+    final uid = GetStorage().read("uid");
     CollectionReference siswa = firestore.collection("siswa");
 
-    await siswa.doc(nisn).update({
+    await siswa.doc(uid).update({
       "photoUrl": url,
       "updatedTime": date,
     });
@@ -255,25 +256,25 @@ class AuthController extends GetxController {
   }
 
 //  SEARCH
-  void addNewConnection(String friendNisn) async {
-    final nisn = GetStorage().read("nisn");
+  void addNewConnection(String friendUid) async {
+    final uid = GetStorage().read("uid");
     bool flagNewConnection = false;
     String date = DateTime.now().toIso8601String();
     CollectionReference chats = firestore.collection("chats");
     CollectionReference siswa = firestore.collection("siswa");
     var chatId;
-    final docChats = await siswa.doc(nisn).collection("chats").get();
+    final docChats = await siswa.doc(uid).collection("chats").get();
 
     if (docChats.docs.length != 0) {
       // user sudah pernah chat dengan siapapun
       final checkConnection = await siswa
-          .doc(nisn)
+          .doc(uid)
           .collection("chats")
-          .where("connection", isEqualTo: friendNisn)
+          .where("connection", isEqualTo: friendUid)
           .get();
 
       if (checkConnection.docs.length != 0) {
-        // sudah pernah buat koneksi dengan friendNisn
+        // sudah pernah buat koneksi dengan friendUid
         flagNewConnection = false;
         chatId = checkConnection.docs[0].id;
       } else {
@@ -289,12 +290,12 @@ class AuthController extends GetxController {
     if (flagNewConnection) {
       final chatDocs = await chats.where("connection", whereIn: [
         [
-          nisn,
-          friendNisn,
+          uid,
+          friendUid,
         ],
         [
-          friendNisn,
-          nisn,
+          friendUid,
+          uid,
         ],
       ]).get();
 
@@ -303,13 +304,13 @@ class AuthController extends GetxController {
         final chatDataId = chatDocs.docs[0].id;
         final chatsData = chatDocs.docs[0].data() as Map<String, dynamic>;
 
-        await siswa.doc(nisn).collection("chats").doc(chatDataId).set({
-          "connection": friendNisn,
+        await siswa.doc(uid).collection("chats").doc(chatDataId).set({
+          "connection": friendUid,
           "lastTime": chatsData["lastTime"],
           "total_unread": 0,
         });
 
-        final listChats = await siswa.doc(nisn).collection("chats").get();
+        final listChats = await siswa.doc(uid).collection("chats").get();
 
         if (listChats.docs.length != 0) {
           List<ChatsUser> dataListChats = List<ChatsUser>.empty().toList();
@@ -338,23 +339,23 @@ class AuthController extends GetxController {
         // buat baru chats(belum ada koneksi )
         final newChatDoc = await chats.add({
           "connection": [
-            nisn,
-            friendNisn,
+            uid,
+            friendUid,
           ],
         });
 
         await chats.doc(newChatDoc.id).collection("chat");
 
-        await siswa.doc(nisn).collection("chats").doc(newChatDoc.id).set({
-          "connection": friendNisn,
+        await siswa.doc(uid).collection("chats").doc(newChatDoc.id).set({
+          "connection": friendUid,
           "lastTime": date,
           "total_unread": 0,
         });
 
-        final listChats = await siswa.doc(nisn).collection("chats").get();
+        final listChats = await siswa.doc(uid).collection("chats").get();
 
         if (listChats.docs.length != 0) {
-          List<ChatsUser> dataListChats = List<ChatsUser>.empty();
+          List<ChatsUser> dataListChats = List<ChatsUser>.empty().toList();
           listChats.docs.forEach((element) {
             var dataDocChat = element.data();
             var dataDocChatId = element.id;
@@ -387,7 +388,7 @@ class AuthController extends GetxController {
         .doc(chatId)
         .collection("chat")
         .where("isRead", isEqualTo: false)
-        .where("penerima", isEqualTo: nisn)
+        .where("penerima", isEqualTo: uid)
         .get();
     updateStatusChat.docs.forEach((element) async {
       await chats.doc(chatId).collection("chat").doc(element.id).update({
@@ -395,12 +396,12 @@ class AuthController extends GetxController {
       });
     });
 
-    await siswa.doc(nisn).collection("chats").doc(chatId).update({
+    await siswa.doc(uid).collection("chats").doc(chatId).update({
       "total_unread": 0,
     });
     Get.toNamed(Routes.CHAT_ROOM, arguments: {
       "chat_id": "$chatId",
-      "friendNisn": friendNisn,
+      "friendUid": friendUid,
       "friendUserModel": friendUser.value,
     });
   }
@@ -408,5 +409,21 @@ class AuthController extends GetxController {
   void toggleDark() {
     mode.toggle();
     GetStorage().write("darkMode", mode.value);
+  }
+
+  void changePage(i) {
+    switch (i) {
+      case 1:
+        pageIndex.value = i;
+        Get.offAllNamed(Routes.HOME);
+        break;
+      case 2:
+        pageIndex.value = i;
+        Get.offAllNamed(Routes.PROFILE);
+        break;
+      default:
+        pageIndex.value = i;
+        Get.offAllNamed(Routes.PRESENSI_SISWA);
+    }
   }
 }
